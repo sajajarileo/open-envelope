@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- @sajajari_leo -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>편지</title>
+  <style>
+    :root {
+      --mainC: hsl(0, 0%, 90%);
+      --mainC_l: hsl(0, 0%, 100%);
+      --mainC_d: hsl(0, 0%, 80%);
+      --mainC_dt: hsl(0, 0%, 70%);
+      --subC: hsl(0, 0%, 20%);
+      --bgc: hsl(0, 0%, 10%);
+      --url_seal_frontface: url(https://sajajarileo.github.io/open-envelope/img/seal_frontface.png);
+      --url_seal_backface: url(https://sajajarileo.github.io/open-envelope/img/seal_backface.png);
+    }
+    * {margin: 0; padding: 0; list-style: none; -webkit-tap-highlight-color: transparent;}
+    body {
+      margin: auto;
+      overflow: hidden;
+      max-width: calc(100vh / 3 * 2);
+      background-color: var(--bgc);
+    }
+    #content {
+      position: relative;
+      width: 100%; height: 100svh;
+    }
+    h1 {
+      position: absolute;
+      left: 50%; top: 20%;
+      color: #fff;
+      transform: translate(-50%, -50%);
+    }
+    #envelope {
+      position: absolute;
+      left: 50%; top: 60%;
+      width: 50%; height: 0;
+      padding-top: calc(50% / 3 * 2);
+      box-shadow: 0 5px 5px var(--subC);
+      border-radius: 2.5%;
+      background: linear-gradient(transparent 20%, var(--mainC) 20%, var(--mainC) 100%), linear-gradient(transparent 15%, var(--subC) 25%) 0 / 10%, linear-gradient(transparent 15%, var(--subC) 25%) right / 10%, conic-gradient(at 90% 10%, transparent 58deg, var(--mainC_d) 58deg, var(--mainC_d) 180deg, transparent 180deg), conic-gradient(at 10% 10%, transparent 180deg, var(--mainC_d) 180deg, var(--mainC_d) 302deg, transparent 302deg);
+      background-color: var(--mainC_dt);
+      background-repeat: no-repeat;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+    #envelope::after {
+      position: absolute; left: 0; bottom: 0;
+      content: ''; width: 100%; height: 100%;
+      border-radius: inherit;
+      background: inherit;
+      background-color: transparent;
+      /*
+      스펙상 shorthand에 명시된 속성을 longhand로 바꿀 수 없으나,
+      지금 할때는 #envelope의 background에 bgc를 포함해도 정상 작동함.
+      어쨌든 안전하게 bg와 bgc 분리.
+      */
+    }
+    #envelope::before,
+    #envelope_seal {
+      --bgc: var(--mainC_dt);
+      --bgi_front: none;
+      --bgi_back: var(--url_seal_backface) center 60% / 25%;
+      position: absolute; left: 0; top: 0;
+      content: '';
+      width: 100%; height: 100%;
+      border-radius: inherit;
+      background: var(--bgi_front), conic-gradient(at 50% 60%, var(--bgc) 69deg, transparent 69deg, transparent 291deg, var(--bgc) 291deg), var(--bgi_back);
+      background-repeat: no-repeat;
+      transform-origin: top;
+      transform-style: preserve-3d;
+      z-index: -1;
+    }
+    #envelope_seal {
+      --bgc: var(--mainC_l);
+      --bgi_front: var(--url_seal_frontface) center 60% / 25%, radial-gradient(circle at 50% 57%, var(--subC) 17.5%, transparent 22.5%);
+      --bgi_back: linear-gradient(201deg, var(--subC) 45%, transparent 50%) 0 / 50%, linear-gradient(159deg, var(--subC) 45%, transparent 50%) right / 50%;
+      backface-visibility: hidden;
+      z-index: 1;
+    }
+    #letter {
+      position: absolute;
+      left: 50%; top: 40%;
+      width: 80%; height: 180%;
+      transform: translate(-50%, -50%);
+    }
+    .letter_content {
+      position: relative;
+      margin-bottom: -1px;
+      width: 100%; height: calc(100% / 3 + 1px);
+      background-color: hsl(0, 100%, 40%);
+      transform-style: preserve-3d;
+    }
+    .letter_content::after,
+    .letter_content::before {
+      position: absolute; left: 0; top: 0;
+      content: '';
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+    }
+    .letter_content::before {transform: rotateX(-180deg);}
+
+    .letter_content:nth-of-type(1) {
+      transform: rotateX(-180deg);
+      transform-origin: bottom;
+      z-index: 1;
+    }
+    .letter_content:nth-of-type(2) {
+      animation: none!important;
+    }
+    .letter_content:nth-of-type(3) {
+      transform: rotateX(-180deg);
+      transform-origin: top;
+    }
+    .letter_content::after {
+      background-color: #fff;
+    }
+    .letter_content::before {
+      background: linear-gradient(hsla(0, 0%, 0%, 50%) 0%, hsla(0, 0%, 0%, 25%) 100%);
+      opacity: 0;
+    }
+    :root {
+      --dur1: 1s;
+      --dur2: 1s;
+      --dur3: 1.5s;
+      --dur4: 2s;
+      --dur5: 0.75s;
+      --del2: var(--dur1);
+      --del3: calc(var(--dur1) + var(--dur2));
+      --del4: calc(var(--dur1) + var(--dur2) + var(--dur3));
+      --del5: calc(var(--dur1) + var(--dur2) + var(--dur3) + var(--dur4));
+    }
+    .start h1 {animation: h1 calc(var(--dur1) / 2) ease-out forwards;}
+    .start #envelope {cursor: auto; animation: envelope var(--dur1) forwards, envelope_an2 calc(var(--dur2) / 2) var(--del2) forwards, envelope_an3 var(--dur5) var(--del5) forwards;}
+    .start #envelope::after {animation: envelope_after calc(var(--dur3) / 2) var(--del3) forwards;}
+    .start #envelope::before,
+    .start #envelope_seal {animation: envelope_an2 calc(var(--dur2) / 2) var(--del2) forwards, envelope_seal var(--dur2) var(--del2) forwards;}
+    .start #letter {animation: letter var(--dur3) var(--del3) ease-in-out forwards, letter_an2 calc(var(--dur4) / 4) calc(var(--del4) + var(--dur4) / 4 * 3) forwards;}
+    .start .letter_content {
+      animation: letter_content var(--dur4) forwards;
+      animation-delay: var(--del4);
+    }
+    .start .letter_content:nth-of-type(3) {animation-delay: calc(var(--del4) + var(--dur4) * 0.2);}
+    .start .letter_content::before {
+      animation: letter_content_before var(--dur4) forwards;
+      animation-delay: inherit;
+    }
+    @keyframes h1 {to {opacity: 0;}}
+    @keyframes envelope {to {top: 50%;}}
+    @keyframes envelope_an2 {to {border-radius: 0 0 2.5% 2.5%;}}
+    @keyframes envelope_an3 {
+      to {
+        width: calc(100% - 2em);
+        padding-top: calc((100% - 2em) / 3 * 2);
+      }
+    }
+    @keyframes envelope_after {to {visibility: hidden;}}
+    @keyframes envelope_seal {to {transform: rotateX(180deg);}}
+    @keyframes letter {50% {top: -40%; transform: translate(-50%, -50%) rotate(15deg);} to {top: 50%;}}
+    @keyframes letter_an2 {to {box-shadow: 0 0 5px var(--subC);}}
+    @keyframes letter_content {to {transform: rotateX(0);}}
+    @keyframes letter_content_before {to {opacity: 1;}}
+  </style>
+</head>
+<body>
+  <section id="content">
+    <h1>편지의 제목</h1>
+    <article id="envelope">
+      <div id="envelope_seal"></div>
+      <ul id="letter">
+        <li class="letter_content"></li>
+        <li class="letter_content"></li>
+        <li class="letter_content"></li>
+      </ul>
+      <div id="envelope_outer"></div>
+    </article>
+  </section>
+  <script>
+    const ID_CONTENT = document.getElementById('content');
+    const ID_ENVELOPE = document.getElementById('envelope');
+
+    ID_ENVELOPE.addEventListener('click', function() {
+      if (ID_CONTENT.classList.contains('start')) return
+      ID_CONTENT.classList.add('start');
+      this.style.cursor = 'auto';
+    });
+
+    ID_ENVELOPE.addEventListener('animationend', function(e) {
+      if (e.animationName === 'envelope_an3') {
+        this.style.cursor = 'pointer';
+        this.addEventListener('click', function removeCls() {
+          ID_CONTENT.classList.remove('start');
+          this.removeEventListener('click', removeCls);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
